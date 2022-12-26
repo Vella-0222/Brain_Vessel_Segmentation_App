@@ -1,25 +1,29 @@
 %histMatching - Description
 %
-% Syntax: ImageT = histMatching(ImageT,targetDS)
+% Syntax: ImageT = HistMatching(ImageT,targetDS)
 %Tran_Image_NoGauss
 % Long description
-function [Trans_Image] = histMatching(imgFile,targetHistFile)
+function [Trans_Image] = HistMatching(MRA_brain,targetHist)
+    % Histogram matching for MRA image after preprocessing.
 
+    % INPUT:
+    %   - MRA_brain : MRA image after preprocessing, including skull
+    %                 stripping, denoising and bias field Correction.
+    %   - targetHist: target histogram, chosen based on MRI scanner.
     
     % load image and its header 
-    imgData = load_untouch_nii(imgFile);
-    ImageT = imgData.img;
-    hdr = imgData.hdr;
+    Image = double(MRA_brain);
+    hdr = MRA_data.hdr;
 
 %     二值化
-    Mask=ImageT>0;
+    Mask=Image>0;
     Mask=double(Mask);
     Mask(Mask>0)=1;
 
     g_kernel = fspecial3('gaussian',3,0.4);%高斯滤波
-    FImage=imfilter(ImageT,g_kernel).*Mask;
+    FImage=imfilter(Image,g_kernel).*Mask;
 
-    load(targetHistFile,'target_hist')
+    load(targetHist,'target_hist')
     [Trans_Image] = Hist_match3D(target_hist,FImage);
 %     FImage_NoGauss=ImageT.*Mask;
 %     [Tran_Image_NoGauss]=Hist_match3D(Target_Hist,FImage_NoGauss);
